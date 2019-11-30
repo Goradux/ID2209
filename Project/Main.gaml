@@ -4,7 +4,7 @@ model MainProject
 
 global {
 	
-	int number_of_people <- 5;
+	int number_of_people <- 50;
 	
 	init{
 //		create people number:number_of_people;
@@ -135,9 +135,9 @@ species visitor skills:[moving, fipa] {
 		// and 10% to gamble
 		switch roll {
 //			match_between [0, 84] {wish <- nil;}
-			match_between [0, 14] {wish <- 'party';}
-			match_between [90, 94] {wish <- 'chill';}
-			match_between [95, 99] {wish <- 'gamble';}
+			match_between [0, 24] {wish <- 'party';}
+			match_between [25, 34] {wish <- 'chill';}
+			match_between [35, 40] {wish <- 'gamble';}
 			default {wish <- 'wander';}
 		}
 	}
@@ -172,13 +172,59 @@ species visitor skills:[moving, fipa] {
 	}
 	
 	reflex chill when: wish = 'chill' and food_level != 0 {
-//		write 'CHILL PLACEHOLDER';
-		wish <- nil;
+		if (status != 'walking to chill' and status != 'chilling') {
+			// this quadrant is food area
+			target_point <- {rnd(50, 100), rnd(0, 50)};	
+		}
+		
+		if (status != 'chilling') {
+			status <- 'walking to chill';	
+		}
+		
+		if (self.location = target_point) {
+			target_point <- nil;
+			status <-'chilling';
+		}
+		
+		if (status = 'chilling') {
+			wish_satisfaction <- wish_satisfaction + 1;
+			do wander;
+			
+			if (wish_satisfaction = 30) {
+				wish_satisfaction <- 0;
+				wish <- nil;
+				status <- 'wandering';
+				wander_point <- self.location;
+			}
+		}
 	}
 	
 	reflex gamble when: wish = 'gamble' and food_level != 0 {
-//		write 'GAMBLE PLACEHOLDER';
-		wish <- nil;
+		if (status != 'walking to gamble' and status != 'gambling') {
+			// this quadrant is food area
+			target_point <- {rnd(50, 100), rnd(50, 100)};	
+		}
+		
+		if (status != 'gambling') {
+			status <- 'walking to gamble';	
+		}
+		
+		if (self.location = target_point) {
+			target_point <- nil;
+			status <-'gambling';
+		}
+		
+		if (status = 'gambling') {
+			wish_satisfaction <- wish_satisfaction + 1;
+			do wander;
+			
+			if (wish_satisfaction = 30) {
+				wish_satisfaction <- 0;
+				wish <- nil;
+				status <- 'wandering';
+				wander_point <- self.location;
+			}
+		}
 	}
 	
 	
