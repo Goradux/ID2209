@@ -51,7 +51,21 @@ species visitor skills:[moving, fipa] {
 	// 2 - copycat (mimics other behaviours)
 	// 3 - journalist
 	// 4 - add later
-	int type <- rnd(0, 4);
+	
+	string get_type {
+//		int type <- rnd(0, 99);
+		switch rnd(0, 99) {
+			match_between [0, 49] {return 'average';}
+			match_between [50, 64] {return 'party';}
+			match_between [65, 79] {return 'chill';}
+			match_between [80, 94] {return 'gambler';}
+			match_between [95, 99] {return 'weirdo';}
+			default {return 'weirdo';}
+		}
+	}
+	string agent_type <- get_type();
+	
+//	agent_type <- rnd_choice(['party', 'chill', 'average', 'gambler', 'weirdo']);
 	
 	// Attributes:
 	float wealth <- rnd(0, 10)/10;
@@ -103,10 +117,8 @@ species visitor skills:[moving, fipa] {
 	
 	reflex printInfo when: name = 'visitor0' {
 //		festival_map cell <- festival_map grid_at {self.location.x, self.location.x};
-		write name;
-		write status;
-		write wish;
-		write wish_satisfaction;
+		write name + ', ' + agent_type + ', ' + status;
+		write wish + ', ' + wish_satisfaction;
 		write '----';
 //		write festival_map({self.location.x, self.location.y}).color;
 	}
@@ -135,10 +147,10 @@ species visitor skills:[moving, fipa] {
 		// and 10% to gamble
 		switch roll {
 //			match_between [0, 84] {wish <- nil;}
-			match_between [0, 24] {wish <- 'party';}
-			match_between [25, 34] {wish <- 'chill';}
-			match_between [35, 40] {wish <- 'gamble';}
-			default {wish <- 'wander';}
+			match_between [0, 24] {wish <- 'party';}		// 25% to party
+			match_between [25, 34] {wish <- 'chill';}		// 10% to chill
+			match_between [35, 39] {wish <- 'gamble';}		// 5% to gamble
+			default {wish <- 'wander';}						// 60% to wander
 		}
 	}
 	
@@ -227,6 +239,26 @@ species visitor skills:[moving, fipa] {
 		}
 	}
 	
+	reflex interact when: food_level != 0 {
+		switch agent_type {
+			match 'average' {
+				
+			}
+			match 'party' {
+				
+			}
+			match 'chill' {
+				
+			}
+			match 'gambler' {
+				
+			}
+			match 'weirdo' {
+				
+			}
+		}
+	}
+	
 	
 	
 	
@@ -237,25 +269,26 @@ species visitor skills:[moving, fipa] {
 	
 	rgb get_color {
 		
+		// for tracking purposes for agent 'visitor0'
 		if (name = 'visitor0') {
 			return #brown;
 		}
 		
-		if (self.type = 0) {
+		if (self.agent_type = 'party') {
 			return #red;
-		} else if (self.type = 1) {
+		} else if (self.agent_type = 'chill') {
 			return #blue;
-		} else if (self.type = 2) {
+		} else if (self.agent_type = 'average') {
 			return #white;
-		} else if (self.type = 3) {
+		} else if (self.agent_type = 'gambler') {
 			return #yellow;
 		} else {
-			return #green;
+			return #black;
 		}
 	}
 	
 	aspect base {
-		draw circle(1) color: get_color() border: #black;
+		draw circle(1) color: get_color() border: get_color() = #white ? #black : #white;
 		if (name = 'visitor0') {
 			draw (status + ', ' + 'wants to ' + wish) color: #blue font: font("Arial", 20 , #bold);	
 		}
