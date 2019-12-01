@@ -58,9 +58,9 @@ species visitor skills:[moving, fipa] {
 	string agent_type <- get_type();
 	
 	// Attributes (at least 3):
-	float wealth <- rnd(0, 10)/10;
-	bool tired <- false;
-	bool old <- false;
+	int wealth <- rnd(0, 9);
+	bool talkative <- flip(0.5);
+	int age <- rnd(18, 50);
 	
 	int food_level <- rnd(150, 200) min: 0 update: food_level - 1;
 	
@@ -314,16 +314,16 @@ species visitor skills:[moving, fipa] {
 //		}
 		
 		if (self.agent_type = 'party') {
-			return #red;
-		} else if (self.agent_type = 'chill') {
-			return #blue;
-		} else if (self.agent_type = 'average') {
 			return #white;
+		} else if (self.agent_type = 'chill') {
+			return #darkgray;
+		} else if (self.agent_type = 'average') {
+			return #green;
 		} else if (self.agent_type = 'gambler') {
-			return #yellow;
+			return #black;
 		} else {
 			// for 'weirdo'
-			return #black;
+			return #red;
 		}
 	}
 	
