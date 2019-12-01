@@ -45,44 +45,32 @@ global {
 
 species visitor skills:[moving, fipa] {
 	
-	// Types:
-	// 0 - party
-	// 1 - chill
-	// 2 - copycat (mimics other behaviours)
-	// 3 - journalist
-	// 4 - add later
-	
 	string get_type {
-//		int type <- rnd(0, 99);
 		switch rnd(0, 99) {
-			match_between [0, 49] {return 'average';}
-			match_between [50, 64] {return 'party';}
-			match_between [65, 79] {return 'chill';}
-			match_between [80, 94] {return 'gambler';}
-			match_between [95, 99] {return 'weirdo';}
+			match_between [0, 40] {return 'average';}	// 41% for average
+			match_between [41, 58] {return 'party';}	// 18% for party
+			match_between [59, 76] {return 'chill';}	// 18% for chill
+			match_between [77, 94] {return 'gambler';}	// 18% for gambler
+			match_between [95, 99] {return 'weirdo';}	// 5% for weirdo
 			default {return 'weirdo';}
 		}
 	}
 	string agent_type <- get_type();
 	
-//	agent_type <- rnd_choice(['party', 'chill', 'average', 'gambler', 'weirdo']);
-	
-	// Attributes:
+	// Attributes (at least 3):
 	float wealth <- rnd(0, 10)/10;
-	// can be tired or not tired
 	bool tired <- false;
-	// can be old or young
 	bool old <- false;
+	
 	int food_level <- rnd(150, 200) min: 0 update: food_level - 1;
 	
 	string status <- 'wandering';
+	
 	string wish <- nil;
 	int wish_satisfaction <- 0;
 	
-	// ???
-	int in_act <- 0 min: 0 update: in_act - 1;
-	bool busy <- false;
-	
+//	int in_act <- 0 min: 0 update: in_act - 1;
+//	bool busy <- false;
 	
 	point target_point <- nil;
 	point wander_point <- self.location;
@@ -145,12 +133,48 @@ species visitor skills:[moving, fipa] {
 		// 10% to party,
 		// 10% to chill,
 		// and 10% to gamble
-		switch roll {
-//			match_between [0, 84] {wish <- nil;}
-			match_between [0, 24] {wish <- 'party';}		// 25% to party
-			match_between [25, 34] {wish <- 'chill';}		// 10% to chill
-			match_between [35, 39] {wish <- 'gamble';}		// 5% to gamble
-			default {wish <- 'wander';}						// 60% to wander
+		switch agent_type {
+			match 'average' {
+				switch roll {
+					match_between [0, 24] {wish <- 'party';}		// 25% to party
+					match_between [25, 34] {wish <- 'chill';}		// 10% to chill
+					match_between [35, 39] {wish <- 'gamble';}		// 5% to gamble
+					default {wish <- 'wander';}						// 60% to wander
+				}
+			}
+			match 'party' {
+				switch roll {
+					match_between [0, 39] {wish <- 'party';}		// 40% to party
+					match_between [40, 54] {wish <- 'chill';}		// 15% to chill
+//					match_between [35, 39] {wish <- 'gamble';}		// 0% to gamble
+					default {wish <- 'wander';}						// 45% to wander
+				}
+			}
+			match 'chill' {
+				switch roll {
+					match_between [0, 14] {wish <- 'party';}		// 15% to party
+					match_between [15, 49] {wish <- 'chill';}		// 35% to chill
+					match_between [50, 59] {wish <- 'gamble';}		// 10% to gamble
+					default {wish <- 'wander';}						// 40% to wander
+				}
+			}
+			match 'gambler' {
+				switch roll {
+					match_between [0, 9] {wish <- 'party';}		// 10% to party
+					match_between [10, 19] {wish <- 'chill';}		// 10% to chill
+					match_between [20, 59] {wish <- 'gamble';}		// 30% to gamble
+					default {wish <- 'wander';}						// 40% to wander
+				}
+			}
+			match 'weirdo' {
+				switch roll {
+					match_between [0, 4] {wish <- 'party';}		// 5% to party
+					match_between [5, 9] {wish <- 'chill';}		// 5% to chill
+					match_between [10, 14] {wish <- 'gamble';}		// 5% to gamble
+					default {wish <- 'wander';}						// 85% to wander
+				}
+			}
+			default {}
 		}
 	}
 	
@@ -242,7 +266,22 @@ species visitor skills:[moving, fipa] {
 	reflex interact when: food_level != 0 {
 		switch agent_type {
 			match 'average' {
-				
+				// talk to party
+					// attr1 affects
+					// attr2 affects
+					// attr3 affects
+				// talk to chill
+					// attr1 affects
+					// attr2 affects
+					// attr3 affects
+				// talk to gambler
+					// attr1 affects
+					// attr2 affects
+					// attr3 affects
+				// talk to weirdo
+					// attr1 affects
+					// attr2 affects
+					// attr3 affects
 			}
 			match 'party' {
 				
@@ -270,9 +309,9 @@ species visitor skills:[moving, fipa] {
 	rgb get_color {
 		
 		// for tracking purposes for agent 'visitor0'
-		if (name = 'visitor0') {
-			return #brown;
-		}
+//		if (name = 'visitor0') {
+//			return #brown;
+//		}
 		
 		if (self.agent_type = 'party') {
 			return #red;
@@ -283,6 +322,7 @@ species visitor skills:[moving, fipa] {
 		} else if (self.agent_type = 'gambler') {
 			return #yellow;
 		} else {
+			// for 'weirdo'
 			return #black;
 		}
 	}
