@@ -282,6 +282,8 @@ species visitor skills:[moving, fipa] {
 					// attr1 affects
 					// attr2 affects
 					// attr3 affects
+				
+//				do start_conversation to: [visitor at_distance 3] protocol: 'fipa-contract-net' performative: 'inform' contents: [name, agent_type, age, wealth, talkative];
 			}
 			match 'party' {
 				
