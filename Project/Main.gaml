@@ -7,41 +7,9 @@ global {
 	int number_of_people <- 50;
 	
 	init{
-//		create people number:number_of_people;
 		create visitor number: number_of_people;
-//		create stage number:4;
 	}
 }
-
-//species stage skills:[moving, fipa] {		
-//	int playing <- 0 min: 0 update: playing - 1;
-//	float aspect1 <- rnd(0,255)/10;
-//	float aspect2 <- float(0);
-//	float aspect3 <- float(0);
-//	float aspect4 <- float(0);
-//	float aspect5 <- float(0);
-//	float aspect6 <- float(0);
-//	
-//	
-//	reflex send_inform when: playing = 0 {
-//		aspect1 <- rnd(0,255)/10;
-//		aspect2 <- rnd(0,255)/10;
-//		aspect3 <- rnd(0,255)/10;
-//		aspect4 <- rnd(0,255)/10;
-//		aspect5 <- rnd(0,255)/10;
-//		aspect6 <- rnd(0,255)/10;
-//	
-//		playing <- rnd(200, 300);
-//		write '(Time ' + time + '): ' + name + ' sends an inform message to all participants';
-//		do start_conversation to: list(people) protocol: 'fipa-contract-net' performative: 'inform' contents: [aspect1, aspect2, aspect3, aspect4, aspect5, aspect6, playing];
-//	}
-//	
-//	aspect base {
-//		float color_ <- aspect1 + aspect2 + aspect3 + aspect4 + aspect5 + aspect6;
-//		draw square(5) color: rgb(color_, color_, color_);
-//	}
-//}
-
 
 species visitor skills:[moving, fipa] {
 	
@@ -55,7 +23,7 @@ species visitor skills:[moving, fipa] {
 			default {return 'weirdo';}
 		}
 	}
-	string agent_type <- get_type();
+	string agent_type <- name = 'visitor0' ? 'average' : get_type();
 	
 	// Attributes (at least 3):
 	int wealth <- rnd(0, 9);
@@ -68,9 +36,6 @@ species visitor skills:[moving, fipa] {
 	
 	string wish <- nil;
 	int wish_satisfaction <- 0;
-	
-//	int in_act <- 0 min: 0 update: in_act - 1;
-//	bool busy <- false;
 	
 	point target_point <- nil;
 	point wander_point <- self.location;
@@ -103,13 +68,13 @@ species visitor skills:[moving, fipa] {
 		do goto target: target_point;
 	}
 	
-	reflex printInfo when: name = 'visitor0' {
-//		festival_map cell <- festival_map grid_at {self.location.x, self.location.x};
-		write name + ', ' + agent_type + ', ' + status;
-		write wish + ', ' + wish_satisfaction;
-		write '----';
-//		write festival_map({self.location.x, self.location.y}).color;
-	}
+//	reflex printInfo when: name = 'visitor0' {
+////		festival_map cell <- festival_map grid_at {self.location.x, self.location.x};
+//		write name + ', ' + agent_type + ', ' + status;
+//		write wish + ', ' + wish_satisfaction;
+//		write '----';
+////		write festival_map({self.location.x, self.location.y}).color;
+//	}
 	
 	
 	reflex eat when: food_level = 0 {
@@ -263,58 +228,351 @@ species visitor skills:[moving, fipa] {
 		}
 	}
 	
-	reflex interact when: food_level != 0 {
+	// name, agent_type, age, wealth, talkative
+	//   0        1       2     3         4
+	reflex answer_visitor when: !empty(informs) {
 		switch agent_type {
 			match 'average' {
-				// talk to party
-					// attr1 affects
-					// attr2 affects
-					// attr3 affects
-				// talk to chill
-					// attr1 affects
-					// attr2 affects
-					// attr3 affects
-				// talk to gambler
-					// attr1 affects
-					// attr2 affects
-					// attr3 affects
-				// talk to weirdo
-					// attr1 affects
-					// attr2 affects
-					// attr3 affects
+//				if (name = 'visitor0') {
+//					write '---';
+//					write 'last informs: ' + informs[length(informs) - 1];	
+//				}
+//				write informs;
+				// average person
+				message one_inform <- informs[length(informs) - 1];
 				
-//				do start_conversation to: [visitor at_distance 3] protocol: 'fipa-contract-net' performative: 'inform' contents: [name, agent_type, age, wealth, talkative];
+				switch festival_map({self.location.x, self.location.y}).color {
+					match #white {
+						// party
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[2] + ') wants to party with me!';}
+						if (abs(int(one_inform.contents[2]) - age) < 10 and one_inform.contents[1] != 'weirdo') {
+							do agree message: one_inform contents: ['Yes'];
+							if (name = 'visitor0') {write 'PARTY!';}
+						} else {
+							do cancel message: one_inform contents: ['No'];
+							if (name = 'visitor0') {write 'No, yuck.';}
+						}
+						do end_conversation message: one_inform contents: ['Action'];
+						
+					}
+					match #darkgray {
+						// chill
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[4] + ') wants to chill with me!';}
+						if ((one_inform.contents[4] = string(talkative)) and one_inform.contents[1] != 'weirdo') {
+							do agree message: one_inform contents: ['Yes'];
+							if (name = 'visitor0') {write 'Chillax time it is!';}
+						} else {
+							do cancel message: one_inform contents: ['No'];
+							if (name = 'visitor0') {write 'No, our personalities dont match.';}
+						}
+						do end_conversation message: one_inform contents: ['Action'];
+					}
+					match #gray {
+						// food
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[1] + ') wants to eat with me!';}
+						if (one_inform.contents[1] = agent_type) {
+							do agree message: one_inform contents: ['Yes'];
+							if (name = 'visitor0') {write 'Then we shall feast!';}
+						} else {
+							do cancel message: one_inform contents: ['No'];
+							if (name = 'visitor0') {write 'No, wrong type.';}
+						}
+						do end_conversation message: one_inform contents: ['Action'];
+					}
+					match #black {
+						// gambling
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[3] + ') wants to gamble with me!';}
+						if (int(one_inform.contents[3]) > 5 and wealth > 5) {
+							do agree message: one_inform contents: ['Yes'];
+							if (name = 'visitor0') {write 'Lets play then!';}
+						} else {
+							do cancel message: one_inform contents: ['No'];
+							if (name = 'visitor0') {write 'No, one of us is too poor.';}
+						}
+						do end_conversation message: one_inform contents: ['Action'];
+					}
+				}
+				
+//				if (name = 'visitor0') {
+//					write '' + one_inform.contents[0] +  '(' + one_inform.contents[1] + ') has proposed to...';
+//				}
 			}
 			match 'party' {
+				// party person
+				message one_inform <- informs[length(informs) - 1];
 				
+				switch festival_map({self.location.x, self.location.y}).color {
+					match #white {
+						// party
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[2] + ') wants to party with me!';}
+						do agree message: one_inform contents: ['Yes'];
+						if (name = 'visitor0') {write 'PARTY!';}
+						do end_conversation message: one_inform contents: ['Action'];
+						
+					}
+					match #darkgray {
+						// chill
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[4] + ') wants to chill with me!';}
+						if ((one_inform.contents[4] = string(talkative)) and one_inform.contents[1] != 'weirdo') {
+							do agree message: one_inform contents: ['Yes'];
+							if (name = 'visitor0') {write 'Chillax time it is!';}
+						} else {
+							do cancel message: one_inform contents: ['No'];
+							if (name = 'visitor0') {write 'No, our personalities dont match.';}
+						}
+						do end_conversation message: one_inform contents: ['Action'];
+					}
+					match #gray {
+						// food
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[1] + ') wants to eat with me!';}
+						if (one_inform.contents[1] = agent_type) {
+							do agree message: one_inform contents: ['Yes'];
+							if (name = 'visitor0') {write 'Then we shall feast!';}
+						} else {
+							do cancel message: one_inform contents: ['No'];
+							if (name = 'visitor0') {write 'No, wrong type.';}
+						}
+						do end_conversation message: one_inform contents: ['Action'];
+					}
+					match #black {
+						// gambling
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[3] + ') wants to gamble with me!';}
+						if (int(one_inform.contents[3]) > 5 and wealth > 5) {
+							do agree message: one_inform contents: ['Yes'];
+							if (name = 'visitor0') {write 'Lets play then!';}
+						} else {
+							do cancel message: one_inform contents: ['No'];
+							if (name = 'visitor0') {write 'No, one of us is too poor.';}
+						}
+						do end_conversation message: one_inform contents: ['Action'];
+					}
+				}
 			}
 			match 'chill' {
+				// chill person
+				message one_inform <- informs[length(informs) - 1];
 				
+				switch festival_map({self.location.x, self.location.y}).color {
+					match #white {
+						// party
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[2] + ') wants to party with me!';}
+						do cancel message: one_inform contents: ['No'];
+						if (name = 'visitor0') {write 'Ah, partying is too much action...';}
+						do end_conversation message: one_inform contents: ['Action'];
+						
+					}
+					match #darkgray {
+						// chill
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[4] + ') wants to chill with me!';}
+						do agree message: one_inform contents: ['Yes'];
+						if (name = 'visitor0') {write 'Chill? Chill!';}
+						do end_conversation message: one_inform contents: ['Action'];
+					}
+					match #gray {
+						// food
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[1] + ') wants to eat with me!';}
+						if (one_inform.contents[1] = agent_type) {
+							do agree message: one_inform contents: ['Yes'];
+							if (name = 'visitor0') {write 'Then we shall feast!';}
+						} else {
+							do cancel message: one_inform contents: ['No'];
+							if (name = 'visitor0') {write 'No, wrong type.';}
+						}
+						do end_conversation message: one_inform contents: ['Action'];
+					}
+					match #black {
+						// gambling
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[3] + ') wants to gamble with me!';}
+						if (int(one_inform.contents[3]) > 3 and wealth > 6) {
+							do agree message: one_inform contents: ['Yes'];
+							if (name = 'visitor0') {write 'Lets play then! I have some extra money.';}
+						} else {
+							do cancel message: one_inform contents: ['No'];
+							if (name = 'visitor0') {write 'No, one of us is too poor.';}
+						}
+						do end_conversation message: one_inform contents: ['Action'];
+					}
+				}
 			}
 			match 'gambler' {
+				// gambler person
+				message one_inform <- informs[length(informs) - 1];
 				
+				switch festival_map({self.location.x, self.location.y}).color {
+					match #white {
+						// party
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[2] + ') wants to party with me!';}
+						if (abs(int(one_inform.contents[2]) - age) < 10 and one_inform.contents[1] != 'weirdo') {
+							do agree message: one_inform contents: ['Yes'];
+							if (name = 'visitor0') {write 'PARTY!';}
+						} else {
+							do cancel message: one_inform contents: ['No'];
+							if (name = 'visitor0') {write 'No, yuck.';}
+						}
+						do end_conversation message: one_inform contents: ['Action'];
+						
+					}
+					match #darkgray {
+						// chill
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[4] + ') wants to chill with me!';}
+						if ((one_inform.contents[4] = string(talkative)) and one_inform.contents[1] != 'weirdo' and wealth = 0) {
+							do agree message: one_inform contents: ['Yes'];
+							if (name = 'visitor0') {write 'Guess I will chill, I am too poor to gamble...';}
+						} else {
+							do cancel message: one_inform contents: ['No'];
+							if (name = 'visitor0') {write 'No, our personalities dont match.';}
+						}
+						do end_conversation message: one_inform contents: ['Action'];
+					}
+					match #gray {
+						// food
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[1] + ') wants to eat with me!';}
+						if (one_inform.contents[1] = agent_type) {
+							do agree message: one_inform contents: ['Yes'];
+							if (name = 'visitor0') {write 'Then we shall feast!';}
+						} else {
+							do cancel message: one_inform contents: ['No'];
+							if (name = 'visitor0') {write 'No, wrong type.';}
+						}
+						do end_conversation message: one_inform contents: ['Action'];
+					}
+					match #black {
+						// gambling
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[3] + ') wants to gamble with me!';}
+						if (int(one_inform.contents[3]) > 1 and wealth > 0) {
+							do agree message: one_inform contents: ['Yes'];
+							if (name = 'visitor0') {write 'Oh yes. GAMBLING!';}
+						} else {
+							do cancel message: one_inform contents: ['No'];
+							if (name = 'visitor0') {write 'No, one of us is too poor.';}
+						}
+						do end_conversation message: one_inform contents: ['Action'];
+					}
+				}
 			}
 			match 'weirdo' {
+				// weird person
+				message one_inform <- informs[length(informs) - 1];
 				
+				switch festival_map({self.location.x, self.location.y}).color {
+					match #white {
+						// party
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[2] + ') wants to party with me!';}
+						do agree message: one_inform contents: ['Yes'];
+						if (name = 'visitor0') {write 'WEIRD TIME!';}
+						do end_conversation message: one_inform contents: ['Action'];
+						
+					}
+					match #darkgray {
+						// chill
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[4] + ') wants to chill with me!';}
+						do agree message: one_inform contents: ['Yes'];
+						if (name = 'visitor0') {write 'WIERD TIME!';}
+						do end_conversation message: one_inform contents: ['Action'];
+					}
+					match #gray {
+						// food
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[1] + ') wants to eat with me!';}
+						if (one_inform.contents[1] = agent_type) {
+							do agree message: one_inform contents: ['Yes'];
+							if (name = 'visitor0') {write 'Then we shall feast!';}
+						} else {
+							do cancel message: one_inform contents: ['No'];
+							if (name = 'visitor0') {write 'No, wrong type.';}
+						}
+						do end_conversation message: one_inform contents: ['Action'];
+					}
+					match #black {
+						// gambling
+						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[3] + ') wants to gamble with me!';}
+						if (int(one_inform.contents[3]) > 5) {
+							do agree message: one_inform contents: ['Yes'];
+							if (name = 'visitor0') {write 'Only if you are paying!';}
+						} else {
+							do cancel message: one_inform contents: ['No'];
+							if (name = 'visitor0') {write 'No, they are too poor.';}
+						}
+						do end_conversation message: one_inform contents: ['Action'];
+					}
+				}
+			}
+		}
+	}
+	
+	visitor asked_last_time <- nil;
+	reflex ask_visitor when: food_level != 0 and !(empty(visitor at_distance 5)) {
+		switch agent_type {
+			match 'average' {
+				bool should_ask <- flip(0.3);
+				if (should_ask) {
+					list<visitor> nearby_visitors <- visitor at_distance 5;
+					visitor selected_visitor <- nearby_visitors[rnd(0, length(nearby_visitors) - 1)];
+					if (asked_last_time != selected_visitor) {
+						do start_conversation to: [selected_visitor] protocol: 'fipa-contract-net' performative: 'inform' contents: [name, agent_type, age, wealth, talkative];	
+					}
+					asked_last_time <- selected_visitor;
+				} else {
+					asked_last_time <- visitor at_distance 5 at 0;
+				}
+			}
+			match 'party' {
+				bool should_ask <- flip(0.5);
+				if (should_ask) {
+					list<visitor> nearby_visitors <- visitor at_distance 5;
+					visitor selected_visitor <- nearby_visitors[rnd(0, length(nearby_visitors) - 1)];
+					if (asked_last_time != selected_visitor) {
+						do start_conversation to: [selected_visitor] protocol: 'fipa-contract-net' performative: 'inform' contents: [name, agent_type, age, wealth, talkative];	
+					}
+					asked_last_time <- selected_visitor;	
+				} else {
+					asked_last_time <- visitor at_distance 5 at 0;
+				}
+			}
+			match 'chill' {
+				bool should_ask <- flip(0.15);
+				if (should_ask) {
+					list<visitor> nearby_visitors <- visitor at_distance 5;
+					visitor selected_visitor <- nearby_visitors[rnd(0, length(nearby_visitors) - 1)];
+					if (asked_last_time != selected_visitor) {
+						do start_conversation to: [selected_visitor] protocol: 'fipa-contract-net' performative: 'inform' contents: [name, agent_type, age, wealth, talkative];	
+					}
+					asked_last_time <- selected_visitor;	
+				} else {
+					asked_last_time <- visitor at_distance 5 at 0;
+				}
+			}
+			match 'gambler' {
+				bool should_ask <- flip(0.1);
+				if (should_ask) {
+					list<visitor> nearby_visitors <- visitor at_distance 5;
+					visitor selected_visitor <- nearby_visitors[rnd(0, length(nearby_visitors) - 1)];
+					if (asked_last_time != selected_visitor) {
+						do start_conversation to: [selected_visitor] protocol: 'fipa-contract-net' performative: 'inform' contents: [name, agent_type, age, wealth, talkative];	
+					}
+					asked_last_time <- selected_visitor;	
+				} else {
+					asked_last_time <- visitor at_distance 5 at 0;
+				}
+			}
+			match 'weirdo' {
+				bool should_ask <- flip(0.9);
+				if (should_ask) {
+					list<visitor> nearby_visitors <- visitor at_distance 5;
+					visitor selected_visitor <- nearby_visitors[rnd(0, length(nearby_visitors) - 1)];
+					if (asked_last_time != selected_visitor) {
+						do start_conversation to: [selected_visitor] protocol: 'fipa-contract-net' performative: 'inform' contents: [name, agent_type, age, wealth, talkative];	
+					}
+					asked_last_time <- selected_visitor;	
+				}
 			}
 		}
 	}
 	
 	
 	
-	
-	
-	
-	
 	//	Rendering the visitor:
 	
 	rgb get_color {
-		
-		// for tracking purposes for agent 'visitor0'
-//		if (name = 'visitor0') {
-//			return #brown;
-//		}
-		
 		if (self.agent_type = 'party') {
 			return #white;
 		} else if (self.agent_type = 'chill') {
@@ -332,67 +590,10 @@ species visitor skills:[moving, fipa] {
 	aspect base {
 		draw circle(1) color: get_color() border: get_color() = #white ? #black : #white;
 		if (name = 'visitor0') {
-			draw (status + ', ' + 'wants to ' + wish) color: #blue font: font("Arial", 20 , #bold);	
+			draw (status + ', ' + 'wants to ' + wish + ', ' + agent_type + ', ' + wealth + '$, ' + age + 'y.o., ' + talkative) color: #blue font: font("Arial", 20 , #bold);
 		}
 	}
 }
-
-//species people skills:[moving, fipa] {
-//	float aspect1 <- rnd(0,255)/10;
-//	float aspect2 <- rnd(0,255)/10;
-//	float aspect3 <- rnd(0,255)/10;
-//	float aspect4 <- rnd(0,255)/10;
-//	float aspect5 <- rnd(0,255)/10;
-//	float aspect6 <- rnd(0,255)/10;
-//	float color_ <- aspect1 + aspect2 + aspect3 + aspect4 + aspect5 + aspect6;
-//	
-//	float best_deal <- float(99999);
-//	point best_deal_p <- nil;
-//	int in_act <- 0 min: 0 update: in_act - 1;
-//	
-//	rgb color <- #green;
-//	point targetPoint <- nil;
-//	
-//	reflex go_wander when: in_act = 0 {
-//		targetPoint <- point(rnd(0, 100), rnd(0, 100));
-//		best_deal <- float(99999);
-//	}
-//	
-//	reflex receive_inform when: !empty(informs) and in_act = 0 {
-//		int tmp_;
-//		loop i over: informs {
-//			 message proposal <- i;
-//		     float val <- abs(color_ - (int(proposal.contents[0]) + int(proposal.contents[1]) + int(proposal.contents[2]) + int(proposal.contents[3]) + int(proposal.contents[4]) + int(proposal.contents[5])));
-//		     write "Contents: " + proposal.contents;
-//		     write string(val) + " <<<>>> " + best_deal;
-//		     if(val < best_deal) {
-//		     	best_deal <- val;
-//		     	write name + ' chose to go to ' + proposal.sender;
-//		     	best_deal_p <- proposal.sender; 
-//		     	tmp_ <- int(proposal.contents[6]);
-//			 }
-//		}
-//		targetPoint <- best_deal_p;
-//		in_act <- tmp_;
-//	}
-//	
-//	geometry circle_ <- smooth(circle(1), 0.0);
-//	aspect base {
-//		draw circle(1) color: rgb(color_, color_, color_) depth: 1 border: #green;
-//	}
-//	
-//	reflex beIdle when: targetPoint = nil {
-//		do wander speed: 0.1;
-//		
-//	}
-//	
-//	reflex moveToTarget when: targetPoint != nil {
-//		if(targetPoint = location) {
-//			targetPoint <- nil;
-//		}
-//		do goto target: targetPoint;
-//	}
-//}
 
 grid festival_map width: 2 height: 2 neighbors: 4 {
 //    rgb color <- rgb(255, 255, 255) ;
@@ -420,8 +621,6 @@ experiment my_experiment type: gui {
 	output {
 		display map_3D type: opengl{
 			grid festival_map lines: #black;
-//			species stage aspect:base;
-//			species people aspect:base;
 			species visitor aspect: base;
 		}
 	}
