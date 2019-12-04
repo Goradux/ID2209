@@ -6,6 +6,13 @@ global {
 	
 	int number_of_people <- 50;
 	
+	int total_conversations <- 0;
+	int total_denies <- 0;
+	int partied <- 0;
+	int chilled <- 0;
+	int ate <- 0;
+	int gambled <- 0;
+	
 	init{
 		create visitor number: number_of_people;
 	}
@@ -87,6 +94,7 @@ species visitor skills:[moving, fipa] {
 		if (self.location = target_point) {
 			target_point <- nil;
 			food_level <- rnd(150, 200);
+			ate <- ate + 1;
 			status <-'wandering';
 			wander_point <- self.location;
 		}
@@ -165,6 +173,7 @@ species visitor skills:[moving, fipa] {
 			if (wish_satisfaction = 30) {
 				wish_satisfaction <- 0;
 				wish <- nil;
+				partied <- partied + 1;
 				status <- 'wandering';
 				wander_point <- self.location;
 			}
@@ -194,6 +203,7 @@ species visitor skills:[moving, fipa] {
 			if (wish_satisfaction = 30) {
 				wish_satisfaction <- 0;
 				wish <- nil;
+				chilled <- chilled + 1;
 				status <- 'wandering';
 				wander_point <- self.location;
 			}
@@ -222,6 +232,7 @@ species visitor skills:[moving, fipa] {
 			if (wish_satisfaction = 30) {
 				wish_satisfaction <- 0;
 				wish <- nil;
+				gambled <- gambled + 1;
 				status <- 'wandering';
 				wander_point <- self.location;
 			}
@@ -247,9 +258,11 @@ species visitor skills:[moving, fipa] {
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[2] + ') wants to party with me!';}
 						if (abs(int(one_inform.contents[2]) - age) < 10 and one_inform.contents[1] != 'weirdo') {
 							do agree message: one_inform contents: ['Yes'];
+							total_conversations <- total_conversations + 1;
 							if (name = 'visitor0') {write 'PARTY!';}
 						} else {
 							do cancel message: one_inform contents: ['No'];
+							total_denies <- total_denies + 1;
 							if (name = 'visitor0') {write 'No, yuck.';}
 						}
 						do end_conversation message: one_inform contents: ['Action'];
@@ -260,9 +273,11 @@ species visitor skills:[moving, fipa] {
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[4] + ') wants to chill with me!';}
 						if ((one_inform.contents[4] = string(talkative)) and one_inform.contents[1] != 'weirdo') {
 							do agree message: one_inform contents: ['Yes'];
+							total_conversations <- total_conversations + 1;
 							if (name = 'visitor0') {write 'Chillax time it is!';}
 						} else {
 							do cancel message: one_inform contents: ['No'];
+							total_denies <- total_denies + 1;
 							if (name = 'visitor0') {write 'No, our personalities dont match.';}
 						}
 						do end_conversation message: one_inform contents: ['Action'];
@@ -272,9 +287,11 @@ species visitor skills:[moving, fipa] {
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[1] + ') wants to eat with me!';}
 						if (one_inform.contents[1] = agent_type) {
 							do agree message: one_inform contents: ['Yes'];
+							total_conversations <- total_conversations + 1;
 							if (name = 'visitor0') {write 'Then we shall feast!';}
 						} else {
 							do cancel message: one_inform contents: ['No'];
+							total_denies <- total_denies + 1;
 							if (name = 'visitor0') {write 'No, wrong type.';}
 						}
 						do end_conversation message: one_inform contents: ['Action'];
@@ -284,9 +301,11 @@ species visitor skills:[moving, fipa] {
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[3] + ') wants to gamble with me!';}
 						if (int(one_inform.contents[3]) > 5 and wealth > 5) {
 							do agree message: one_inform contents: ['Yes'];
+							total_conversations <- total_conversations + 1;
 							if (name = 'visitor0') {write 'Lets play then!';}
 						} else {
 							do cancel message: one_inform contents: ['No'];
+							total_denies <- total_denies + 1;
 							if (name = 'visitor0') {write 'No, one of us is too poor.';}
 						}
 						do end_conversation message: one_inform contents: ['Action'];
@@ -306,6 +325,7 @@ species visitor skills:[moving, fipa] {
 						// party
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[2] + ') wants to party with me!';}
 						do agree message: one_inform contents: ['Yes'];
+						total_conversations <- total_conversations + 1;
 						if (name = 'visitor0') {write 'PARTY!';}
 						do end_conversation message: one_inform contents: ['Action'];
 						
@@ -315,9 +335,11 @@ species visitor skills:[moving, fipa] {
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[4] + ') wants to chill with me!';}
 						if ((one_inform.contents[4] = string(talkative)) and one_inform.contents[1] != 'weirdo') {
 							do agree message: one_inform contents: ['Yes'];
+							total_conversations <- total_conversations + 1;
 							if (name = 'visitor0') {write 'Chillax time it is!';}
 						} else {
 							do cancel message: one_inform contents: ['No'];
+							total_denies <- total_denies + 1;
 							if (name = 'visitor0') {write 'No, our personalities dont match.';}
 						}
 						do end_conversation message: one_inform contents: ['Action'];
@@ -327,9 +349,11 @@ species visitor skills:[moving, fipa] {
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[1] + ') wants to eat with me!';}
 						if (one_inform.contents[1] = agent_type) {
 							do agree message: one_inform contents: ['Yes'];
+							total_conversations <- total_conversations + 1;
 							if (name = 'visitor0') {write 'Then we shall feast!';}
 						} else {
 							do cancel message: one_inform contents: ['No'];
+							total_denies <- total_denies + 1;
 							if (name = 'visitor0') {write 'No, wrong type.';}
 						}
 						do end_conversation message: one_inform contents: ['Action'];
@@ -339,9 +363,11 @@ species visitor skills:[moving, fipa] {
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[3] + ') wants to gamble with me!';}
 						if (int(one_inform.contents[3]) > 5 and wealth > 5) {
 							do agree message: one_inform contents: ['Yes'];
+							total_conversations <- total_conversations + 1;
 							if (name = 'visitor0') {write 'Lets play then!';}
 						} else {
 							do cancel message: one_inform contents: ['No'];
+							total_denies <- total_denies + 1;
 							if (name = 'visitor0') {write 'No, one of us is too poor.';}
 						}
 						do end_conversation message: one_inform contents: ['Action'];
@@ -357,6 +383,7 @@ species visitor skills:[moving, fipa] {
 						// party
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[2] + ') wants to party with me!';}
 						do cancel message: one_inform contents: ['No'];
+						total_denies <- total_denies + 1;
 						if (name = 'visitor0') {write 'Ah, partying is too much action...';}
 						do end_conversation message: one_inform contents: ['Action'];
 						
@@ -365,6 +392,7 @@ species visitor skills:[moving, fipa] {
 						// chill
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[4] + ') wants to chill with me!';}
 						do agree message: one_inform contents: ['Yes'];
+						total_conversations <- total_conversations + 1;
 						if (name = 'visitor0') {write 'Chill? Chill!';}
 						do end_conversation message: one_inform contents: ['Action'];
 					}
@@ -373,9 +401,11 @@ species visitor skills:[moving, fipa] {
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[1] + ') wants to eat with me!';}
 						if (one_inform.contents[1] = agent_type) {
 							do agree message: one_inform contents: ['Yes'];
+							total_conversations <- total_conversations + 1;
 							if (name = 'visitor0') {write 'Then we shall feast!';}
 						} else {
 							do cancel message: one_inform contents: ['No'];
+							total_denies <- total_denies + 1;
 							if (name = 'visitor0') {write 'No, wrong type.';}
 						}
 						do end_conversation message: one_inform contents: ['Action'];
@@ -385,9 +415,11 @@ species visitor skills:[moving, fipa] {
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[3] + ') wants to gamble with me!';}
 						if (int(one_inform.contents[3]) > 3 and wealth > 6) {
 							do agree message: one_inform contents: ['Yes'];
+							total_conversations <- total_conversations + 1;
 							if (name = 'visitor0') {write 'Lets play then! I have some extra money.';}
 						} else {
 							do cancel message: one_inform contents: ['No'];
+							total_denies <- total_denies + 1;
 							if (name = 'visitor0') {write 'No, one of us is too poor.';}
 						}
 						do end_conversation message: one_inform contents: ['Action'];
@@ -404,9 +436,11 @@ species visitor skills:[moving, fipa] {
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[2] + ') wants to party with me!';}
 						if (abs(int(one_inform.contents[2]) - age) < 10 and one_inform.contents[1] != 'weirdo') {
 							do agree message: one_inform contents: ['Yes'];
+							total_conversations <- total_conversations + 1;
 							if (name = 'visitor0') {write 'PARTY!';}
 						} else {
 							do cancel message: one_inform contents: ['No'];
+							total_denies <- total_denies + 1;
 							if (name = 'visitor0') {write 'No, yuck.';}
 						}
 						do end_conversation message: one_inform contents: ['Action'];
@@ -417,9 +451,11 @@ species visitor skills:[moving, fipa] {
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[4] + ') wants to chill with me!';}
 						if ((one_inform.contents[4] = string(talkative)) and one_inform.contents[1] != 'weirdo' and wealth = 0) {
 							do agree message: one_inform contents: ['Yes'];
+							total_conversations <- total_conversations + 1;
 							if (name = 'visitor0') {write 'Guess I will chill, I am too poor to gamble...';}
 						} else {
 							do cancel message: one_inform contents: ['No'];
+							total_denies <- total_denies + 1;
 							if (name = 'visitor0') {write 'No, our personalities dont match.';}
 						}
 						do end_conversation message: one_inform contents: ['Action'];
@@ -429,9 +465,11 @@ species visitor skills:[moving, fipa] {
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[1] + ') wants to eat with me!';}
 						if (one_inform.contents[1] = agent_type) {
 							do agree message: one_inform contents: ['Yes'];
+							total_conversations <- total_conversations + 1;
 							if (name = 'visitor0') {write 'Then we shall feast!';}
 						} else {
 							do cancel message: one_inform contents: ['No'];
+							total_denies <- total_denies + 1;
 							if (name = 'visitor0') {write 'No, wrong type.';}
 						}
 						do end_conversation message: one_inform contents: ['Action'];
@@ -441,9 +479,11 @@ species visitor skills:[moving, fipa] {
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[3] + ') wants to gamble with me!';}
 						if (int(one_inform.contents[3]) > 1 and wealth > 0) {
 							do agree message: one_inform contents: ['Yes'];
+							total_conversations <- total_conversations + 1;
 							if (name = 'visitor0') {write 'Oh yes. GAMBLING!';}
 						} else {
 							do cancel message: one_inform contents: ['No'];
+							total_denies <- total_denies + 1;
 							if (name = 'visitor0') {write 'No, one of us is too poor.';}
 						}
 						do end_conversation message: one_inform contents: ['Action'];
@@ -459,6 +499,7 @@ species visitor skills:[moving, fipa] {
 						// party
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[2] + ') wants to party with me!';}
 						do agree message: one_inform contents: ['Yes'];
+						total_conversations <- total_conversations + 1;
 						if (name = 'visitor0') {write 'WEIRD TIME!';}
 						do end_conversation message: one_inform contents: ['Action'];
 						
@@ -467,6 +508,7 @@ species visitor skills:[moving, fipa] {
 						// chill
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[4] + ') wants to chill with me!';}
 						do agree message: one_inform contents: ['Yes'];
+						total_conversations <- total_conversations + 1;
 						if (name = 'visitor0') {write 'WIERD TIME!';}
 						do end_conversation message: one_inform contents: ['Action'];
 					}
@@ -475,9 +517,11 @@ species visitor skills:[moving, fipa] {
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[1] + ') wants to eat with me!';}
 						if (one_inform.contents[1] = agent_type) {
 							do agree message: one_inform contents: ['Yes'];
+							total_conversations <- total_conversations + 1;
 							if (name = 'visitor0') {write 'Then we shall feast!';}
 						} else {
 							do cancel message: one_inform contents: ['No'];
+							total_denies <- total_denies + 1;
 							if (name = 'visitor0') {write 'No, wrong type.';}
 						}
 						do end_conversation message: one_inform contents: ['Action'];
@@ -487,9 +531,11 @@ species visitor skills:[moving, fipa] {
 						if (name = 'visitor0') {write '' + one_inform.contents[0] +  '(' + one_inform.contents[3] + ') wants to gamble with me!';}
 						if (int(one_inform.contents[3]) > 5) {
 							do agree message: one_inform contents: ['Yes'];
+							total_conversations <- total_conversations + 1;
 							if (name = 'visitor0') {write 'Only if you are paying!';}
 						} else {
 							do cancel message: one_inform contents: ['No'];
+							total_denies <- total_denies + 1;
 							if (name = 'visitor0') {write 'No, they are too poor.';}
 						}
 						do end_conversation message: one_inform contents: ['Action'];
@@ -623,5 +669,16 @@ experiment my_experiment type: gui {
 			grid festival_map lines: #black;
 			species visitor aspect: base;
 		}
+		
+		display chart {
+        	chart "Chart1" type: series style: spline {
+//     		   	data "Total amount of conversations" value: total_conversations color: #green;
+//        		data "Total amount of denied conversations" value: total_denies color: #red;
+        		data 'Partied' value: partied color: #green;
+        		data 'Chilled' value: chilled color: #red;
+        		data 'Ate' value: ate color: #blue;
+        		data 'Gambled' value: gambled color: #yellow;
+        	}
+    	}
 	}
 }
